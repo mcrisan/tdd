@@ -86,19 +86,11 @@ class NewVisitorTest(LiveServerTestCase):
         
         # Again, there is no trace of Edith's list
         page_text = self.browser.find_element_by_tag_name('body').text
-        self.assertRegexpMatches('Buy peacock feathers', page_text)
+        self.assertNotRegexpMatches('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
         
         # Satisfied, they both go back to sleep
 
-        # Edith wonders whether the site will remember her list. Then she sees
-        # that the site has generated a unique URL for her -- there is some
-        # explanatory text to that effect.
-        self.fail('Finish the test!')
-        
-        # She visits that URL - her to-do list is still there.
-        
-        # Satisfied, she goes back to sleep
 
 if __name__ == '__main__':  
     unittest.main()  
