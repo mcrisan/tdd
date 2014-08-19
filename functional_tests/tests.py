@@ -45,7 +45,7 @@ class NewVisitorTest(LiveServerTestCase):
         # to-do list table
         inputbox.send_keys(Keys.ENTER)
         edith_list_url = self.browser.current_url
-        self.assertRegex(edith_list_url, '/lists/.+') #1
+        self.assertRegexpMatches(edith_list_url, '/lists/.+') #1
         self.check_for_row_in_list_table('1: Buy peacock feathers')
 
         # There is still a text box inviting her to add another item. She
@@ -81,12 +81,12 @@ class NewVisitorTest(LiveServerTestCase):
         
         # Francis gets his own unique URL
         francis_list_url = self.browser.current_url
-        self.assertRegex(francis_list_url, '/lists/.+')
+        self.assertRegexpMatches(francis_list_url, '/lists/.+')
         self.assertNotEqual(francis_list_url, edith_list_url)
         
         # Again, there is no trace of Edith's list
         page_text = self.browser.find_element_by_tag_name('body').text
-        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertRegexpMatches('Buy peacock feathers', page_text)
         self.assertIn('Buy milk', page_text)
         
         # Satisfied, they both go back to sleep
