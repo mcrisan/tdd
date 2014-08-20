@@ -6,7 +6,10 @@ from django.utils.html import escape
 
 from list.views import home_page 
 from list.models import Item, List
-from list.forms import ItemForm, EMPTY_LIST_ERROR
+from list.forms import (
+    DUPLICATE_ITEM_ERROR, EMPTY_LIST_ERROR,
+    ExistingListItemForm, ItemForm,
+)
 
 class HomePageTest(TestCase):  
         
@@ -109,7 +112,13 @@ class ListViewTest(TestCase):
             '/lists/%d/' % (list_.id,),
             data={'text': ''}
         )
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        
+    def test_displays_item_form(self):
+        list_ = List.objects.create()
+        response = self.client.get('/lists/%d/' % (list_.id,))
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        self.assertContains(response, 'name="text"')
      
         
 class NewListTest(TestCase):
