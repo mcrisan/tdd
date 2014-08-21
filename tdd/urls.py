@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     # Examples:
     url(r'^$', home_page, name='home'),
     url(r'^lists/', include('list.urls')),
+    url(r'^accounts/', include('accounts.urls')),
     
     # url(r'^blog/', include('blog.urls')),
 
