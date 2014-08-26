@@ -2,12 +2,16 @@ import sys
 import os
 import time
 
+from django.contrib.auth import BACKEND_SESSION_KEY, SESSION_KEY, get_user_model
+from django.contrib.sessions.backends.db import SessionStore
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from datetime import datetime
+from django.conf import settings
 
+User = get_user_model()
 DEFAULT_WAIT = 5
 SCREEN_DUMP_LOCATION = os.path.abspath(
     os.path.join(os.path.dirname(__file__), 'screendumps')
@@ -73,6 +77,21 @@ class FunctionalTest(LiveServerTestCase):
             windowid=self._windowid,
             timestamp=timestamp
         )
+        
+    def create_pre_authenticated_session(self, email):
+        user = User.objects.create(email=email)
+        session = SessionStore()
+        session[SESSION_KEY] = user.pk #1
+        session[BACKEND_SESSION_KEY] = settings.AUTHENTICATION_BACKENDS[0]
+        session.save()
+        ## to set a cookie we need to first visit the domain.
+        ## 404 pages load the quickest!
+        self.browser.get(self.server_url + "/404_no_such_url/")
+        self.browser.add_cookie(dict(
+            name=settings.SESSION_COOKIE_NAME,
+            value=session.session_key, #2
+            path='/',
+        ))
             
     def check_for_row_in_list_table(self, row_text):
         table = self.browser.find_element_by_id('id_list_table')
