@@ -1,10 +1,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
 
 from list.models import Item, List
 
+User = get_user_model()
 EMPTY_LIST_ERROR = "You can't have an empty list item"
 DUPLICATE_ITEM_ERROR = "You've already got this in your list"
+EMAIL_NOT_VALID_ERROR = "Enter a valid email address."
+USER_NOT_VALID_ERROR = "User does not exist"
+
 
 class ItemForm(forms.models.ModelForm):
 
@@ -42,4 +47,18 @@ class ExistingListItemForm(ItemForm):
         except ValidationError as e:
             e.error_dict = {'text': [DUPLICATE_ITEM_ERROR]}
             self._update_errors(e)
+            
+class ShareWithForm(forms.Form):
+    email = forms.EmailField()
+    
+    def clean_email(self):
+        email=self.data['email']
+        try:
+            User.objects.get(email=self.data['email'])
+        except User.DoesNotExist:
+            raise ValidationError(USER_NOT_VALID_ERROR)
+        return email
+    
+
+            
             

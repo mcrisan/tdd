@@ -9,7 +9,7 @@ from django.utils.html import escape
 from django.contrib.auth import get_user_model
 
 from list.views import home_page 
-from list.views import new_list
+from list.views import new_list, share_list
 from list.models import Item, List
 
 User = get_user_model()
@@ -126,7 +126,7 @@ class ListViewTest(TestCase):
         response = self.client.get('/lists/%d/' % (list_.id,))
         self.assertIsInstance(response.context['form'], ExistingListItemForm)
         self.assertContains(response, 'name="text"')
-     
+           
         
 class  NewListViewIntegratedTest(TestCase):
 
@@ -241,4 +241,28 @@ class MyListsTest(TestCase):
         correct_user = User.objects.create(email='a@b.com')
         response = self.client.get('/lists/users/a@b.com/')
         self.assertEqual(response.context['owner'], correct_user)
+        
+
+class ShareListTest(TestCase):
+    
+    def test_post_redirects_to_lists_page(self):
+        user = User.objects.create(email="")
+        list_ = List.objects.create()
+        response = self.client.post(
+            '/lists/%d/share' % (list_.id,), 
+            data={'email': 'a@b.com'}
+        )
+        new_list = List.objects.first()
+        self.assertRedirects(response, '/lists/%d/' % (list_.id,))
+        
+    def test_check_user_added_to_list(self):
+        user = User.objects.create(email="a@b.com")
+        list_ = List.objects.create(owner=user)
+        response = self.client.post(
+            '/lists/%d/share' % (list_.id,), 
+            data={'email': 'a@b.com'}
+        )
+        self.assertIn(user, list_.shared_with.all())
+        
+        
         

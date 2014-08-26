@@ -3,8 +3,8 @@ from mock import patch, Mock
 from django.test import TestCase
 
 from list.forms import (
-    DUPLICATE_ITEM_ERROR, EMPTY_LIST_ERROR,
-    ExistingListItemForm, ItemForm, NewListForm
+    DUPLICATE_ITEM_ERROR, EMPTY_LIST_ERROR, EMAIL_NOT_VALID_ERROR, USER_NOT_VALID_ERROR, 
+    ExistingListItemForm, ItemForm, NewListForm, ShareWithForm
 )
 from list.models import Item, List
 
@@ -86,3 +86,15 @@ class NewListFormTest(unittest.TestCase):
         form.is_valid()
         response = form.save(owner=user)
         self.assertEqual(response, mock_List_create_new.return_value)
+        
+class ShareWithFormTest(TestCase):
+    
+    def test_form_validation_for_invalid_email(self):
+        form = ShareWithForm(data={'email': 'asd'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['email'], [EMAIL_NOT_VALID_ERROR])
+        
+    def test_form_validation_for_invalid_user(self):
+        form = ShareWithForm(data={'email': 'a@b.com'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['email'], [USER_NOT_VALID_ERROR])

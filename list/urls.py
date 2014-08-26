@@ -9,4 +9,5 @@ urlpatterns = patterns('',
     url(r'^users/(.+)/$', 'list.views.my_lists',
         name='my_lists'
     ),
+    url(r'^(?P<list_id>\d+)/share$', 'list.views.share_list', name='share_list'),
 )
