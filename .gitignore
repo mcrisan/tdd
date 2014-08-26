@@ -4,3 +4,4 @@
 *.pid
 *.sqlite3
 
+functional_tests/screendumps
